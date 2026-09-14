@@ -93,9 +93,7 @@ async def to_code(config):
     cg.add(var.set_te_delay_us(config[CONF_TE_DELAY_US]))
     cg.add(var.set_skip_unchanged(config[CONF_SKIP_UNCHANGED]))
 
-
-
-    # --- FIX: attach the YAML lambda so the display actually renders ---
+    # --- Attach the YAML lambda so the display actually renders ---
     if CONF_LAMBDA in config:
         lambda_ = await cg.process_lambda(
             config[CONF_LAMBDA],

@@ -19,8 +19,6 @@ extern "C" {
 #include <cinttypes>
 #include <cstring>
 
-#include "base64.h"
-#include "esphome/components/api/api_server.h"
 #include "esphome/components/web_server_base/web_server_base.h"
 #include "esphome/core/application.h"
 #include "esphome/core/log.h"
@@ -53,7 +51,7 @@ inline IRAM_ATTR void gpio_clr_mask(uint32_t mask) {
 }  // namespace
 
 // ============================================================================
-// Браузерный загрузчик /ota5901 (не обязателен, но полезен для отладки)
+// Р‘СЂР°СѓР·РµСЂРЅС‹Р№ Р·Р°РіСЂСѓР·С‡РёРє /ota5901 (РЅРµ РѕР±СЏР·Р°С‚РµР»РµРЅ, РЅРѕ РїРѕР»РµР·РµРЅ РґР»СЏ РѕС‚Р»Р°РґРєРё)
 // ============================================================================
 static const char OTA5901_IMAGE_PAGE[] PROGMEM = R"OTAPAGE(<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -61,7 +59,7 @@ static const char OTA5901_IMAGE_PAGE[] PROGMEM = R"OTAPAGE(<!doctype html>
 <style>
 :root{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color-scheme:light dark}body{max-width:860px;margin:24px auto;padding:0 16px}h1{font-size:1.45rem;margin:.2rem 0 1rem}.card{border:1px solid #8886;border-radius:12px;padding:16px;margin:12px 0}label{display:block;margin:.55rem 0}.row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}.row>*{flex:1 1 170px}input[type=file],select,button{font:inherit}button{padding:.7rem 1rem;border-radius:8px;border:1px solid #888;cursor:pointer}button.primary{font-weight:700}button:disabled{opacity:.45;cursor:not-allowed}canvas{width:min(100%,768px);image-rendering:pixelated;border:1px solid #777;background:white;display:block}.small{opacity:.75;font-size:.9rem}#status{white-space:pre-wrap;font-family:ui-monospace,monospace}.range{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}.range input{width:100%}a{color:inherit}
 </style></head><body>
-<h1>SES / OTA5901 — image uploader v13</h1>
+<h1>SES / OTA5901 вЂ” image uploader v13</h1>
 <div class="card">
   <label>Image file <input id="file" type="file" accept="image/png,image/jpeg,image/webp,image/bmp,image/gif"></label>
   <div class="row">
@@ -76,7 +74,7 @@ static const char OTA5901_IMAGE_PAGE[] PROGMEM = R"OTAPAGE(<!doctype html>
         <option value="row-lsb" selected>Row 8px horizontal / LSB left (captured native)</option>
       </select>
     </label>
-    <label><input id="dither" type="checkbox" checked> Floyd–Steinberg dithering</label>
+    <label><input id="dither" type="checkbox" checked> FloydвЂ“Steinberg dithering</label>
     <label><input id="invert" type="checkbox"> Invert black/white</label>
   </div>
   <label class="range"><span>Threshold</span><span id="tv">150</span><input id="threshold" type="range" min="0" max="255" value="150"></label>
@@ -179,7 +177,7 @@ function syntheticFrame(kind){
 }
 async function postFrame(frame){
   if(!frame||frame.length!==SZ)throw new Error('frame size must be 4096 bytes');
-  msg('Uploading 4096 bytes…');
+  msg('Uploading 4096 bytesвЂ¦');
   const r=await fetch('/ota5901/frame',{method:'POST',headers:{'Content-Type':'application/octet-stream'},body:frame});
   const t=await r.text(); if(!r.ok)throw new Error(t||`HTTP ${r.status}`); msg('Accepted.\n'+t);
 }
@@ -259,7 +257,7 @@ void OTA5901Display::setup() {
   }
   ESP_LOGI(TAG, "Framebuffer allocated: %u bytes",
            static_cast<unsigned>(FRAMEBUFFER_SIZE));
-  // HA-службы и веб-хендлер регистрируются лениво в loop().
+  // Р’РµР±-С…РµРЅРґР»РµСЂ СЂРµРіРёСЃС‚СЂРёСЂСѓРµС‚СЃСЏ Р»РµРЅРёРІРѕ РІ loop().
 }
 
 void OTA5901Display::setup_pins_() {
@@ -278,27 +276,7 @@ void OTA5901Display::setup_pins_() {
 }
 
 // ============================================================================
-// Регистрация служб HA
-// ============================================================================
-void OTA5901Display::register_ha_services_() {
-  if (this->ha_services_registered_) return;
-  if (api::global_api_server == nullptr) return;  // API ещё не поднят
-
-  this->register_service(
-      &OTA5901Display::on_upload_frame_b64,
-      "upload_frame_b64",
-      {"frame_b64", "invert"});
-  this->register_service(
-      &OTA5901Display::on_fill_solid,
-      "fill_solid",
-      {"black"});
-
-  this->ha_services_registered_ = true;
-  ESP_LOGI(TAG, "HA services registered: upload_frame_b64, fill_solid");
-}
-
-// ============================================================================
-// Обработчики служб HA
+// РџСѓР±Р»РёС‡РЅС‹Р№ РїСЂРёС‘Рј СЃС‹СЂРѕРіРѕ РєР°РґСЂР° (РґР»СЏ РІС‹Р·РѕРІР° РёР· YAML-Р»СЏРјР±РґС‹)
 // ============================================================================
 bool OTA5901Display::apply_frame_raw(const uint8_t *data, size_t len, bool invert) {
   if (this->is_failed() || this->buffer_ == nullptr) {
@@ -312,7 +290,7 @@ bool OTA5901Display::apply_frame_raw(const uint8_t *data, size_t len, bool inver
     return false;
   }
   if (this->web_upload_in_progress_.load()) {
-    ESP_LOGW(TAG, "Web upload in progress; HA frame ignored");
+    ESP_LOGW(TAG, "Web upload in progress; raw frame ignored");
     return false;
   }
   if (invert) {
@@ -323,32 +301,6 @@ bool OTA5901Display::apply_frame_raw(const uint8_t *data, size_t len, bool inver
   }
   this->queue_refresh_();
   return true;
-}
-
-void OTA5901Display::on_upload_frame_b64(std::string frame_b64, bool invert) {
-  ESP_LOGI(TAG, "HA upload_frame_b64: b64_len=%u, invert=%s",
-           static_cast<unsigned>(frame_b64.size()),
-           invert ? "true" : "false");
-
-  std::vector<uint8_t> raw = base64_decode(frame_b64.c_str(), frame_b64.size());
-  if (raw.empty()) {
-    ESP_LOGE(TAG, "base64 decode failed");
-    return;
-  }
-  if (this->apply_frame_raw(raw.data(), raw.size(), invert)) {
-    ESP_LOGI(TAG, "Frame from HA queued for display");
-  }
-}
-
-void OTA5901Display::on_fill_solid(bool black) {
-  if (this->is_failed() || this->buffer_ == nullptr) return;
-  if (this->web_upload_in_progress_.load()) {
-    ESP_LOGW(TAG, "Web upload in progress; fill_solid ignored");
-    return;
-  }
-  memset(this->buffer_, black ? 0x00 : 0xFF, FRAMEBUFFER_SIZE);
-  this->queue_refresh_();
-  ESP_LOGI(TAG, "Filled %s", black ? "black" : "white");
 }
 
 // ============================================================================
@@ -428,7 +380,7 @@ bool OTA5901Display::start_xclk_() {
 }
 
 // ============================================================================
-// SPI 9-бит (A0 + 8 data)
+// SPI 9-Р±РёС‚ (A0 + 8 data)
 // ============================================================================
 inline void OTA5901Display::spi_delay_() { delayMicroseconds(this->spi_half_period_us_); }
 
@@ -812,9 +764,6 @@ void OTA5901Display::web_abort_frame_upload() {
 // Main loop / update
 // ============================================================================
 void OTA5901Display::loop() {
-  if (!this->ha_services_registered_) {
-    this->register_ha_services_();
-  }
   if (!this->web_handler_registered_) {
     auto *web_base = web_server_base::global_web_server_base;
     if (web_base != nullptr) {
@@ -860,7 +809,6 @@ void OTA5901Display::dump_config() {
   if (this->has_te_pin_)
     ESP_LOGCONFIG(TAG, "  TE: GPIO%u", this->te_pin_);
   ESP_LOGCONFIG(TAG, "  Framebuffer: 256x128, 1 bpp, 4096 bytes, row-lsb");
-  ESP_LOGCONFIG(TAG, "  HA services: upload_frame_b64, fill_solid");
 }
 
 float OTA5901Display::get_setup_priority() const { return setup_priority::PROCESSOR; }

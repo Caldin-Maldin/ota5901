@@ -3,18 +3,14 @@
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
-#include <string>
-#include <vector>
 
-#include "esphome/components/api/custom_api_device.h"
 #include "esphome/components/display/display_buffer.h"
 #include "esphome/core/component.h"
 
 namespace esphome {
 namespace ota5901 {
 
-class OTA5901Display : public display::DisplayBuffer,
-                       public api::CustomAPIDevice {
+class OTA5901Display : public display::DisplayBuffer {
  public:
   void set_sd_pin(uint8_t pin) { this->sd_pin_ = pin; }
   void set_sclk_pin(uint8_t pin) { this->sclk_pin_ = pin; }
@@ -29,13 +25,7 @@ class OTA5901Display : public display::DisplayBuffer,
   void set_skip_unchanged(bool skip) { this->skip_unchanged_ = skip; }
   void set_upload_timeout_ms(uint32_t ms) { this->upload_timeout_ms_ = ms; }
 
-  // --- Home Assistant services ---
-  // esphome.<node>_upload_frame_b64(frame_b64, invert)
-  // esphome.<node>_fill_solid(black)
-  void on_upload_frame_b64(std::string frame_b64, bool invert);
-  void on_fill_solid(bool black);
-
-  // Публичный приём сырого 4096-байтового кадра (можно звать из lambda YAML).
+  // РџСѓР±Р»РёС‡РЅС‹Р№ РїСЂРёС‘Рј СЃС‹СЂРѕРіРѕ 4096-Р±Р°Р№С‚РѕРІРѕРіРѕ РєР°РґСЂР° (РјРѕР¶РЅРѕ Р·РІР°С‚СЊ РёР· lambda YAML).
   bool apply_frame_raw(const uint8_t *data, size_t len, bool invert);
 
   // --- Debug helpers ---
@@ -48,7 +38,7 @@ class OTA5901Display : public display::DisplayBuffer,
   bool debug_reinit_current();
   uint16_t debug_read_status();
 
-  // --- Браузерный загрузчик (POST /ota5901/frame) ---
+  // --- Р‘СЂР°СѓР·РµСЂРЅС‹Р№ Р·Р°РіСЂСѓР·С‡РёРє (POST /ota5901/frame) ---
   bool web_begin_frame_upload(size_t total);
   bool web_write_frame_chunk(size_t index, const uint8_t *data, size_t len, size_t total);
   bool web_finish_frame_upload();
@@ -97,8 +87,6 @@ class OTA5901Display : public display::DisplayBuffer,
   void service_refresh_();
   void write_frame_();
 
-  void register_ha_services_();
-
   uint32_t framebuffer_hash_() const;
 
   uint8_t sd_pin_{4};
@@ -133,7 +121,6 @@ class OTA5901Display : public display::DisplayBuffer,
   uint32_t last_hash_{0};
 
   bool web_handler_registered_{false};
-  bool ha_services_registered_{false};
 
 #ifdef USE_ESP32
   int xclk_ledc_channel_{-1};
