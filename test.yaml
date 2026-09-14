@@ -1,0 +1,530 @@
+esphome:
+  name: test
+  friendly_name: test
+
+esp32:
+  board: esp32-c3-devkitm-1
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  custom_services: true 
+  encryption:
+    key: "bP48hnO2j2PEDXpG88hkLZdnDTlj7aLcU55AImXy+tM="
+  actions:
+    - action: display_message
+      variables:
+        line1: string
+        pos_x1: int
+        pos_y1: int
+        font1: int
+        align1: int
+        line2: string
+        pos_x2: int
+        pos_y2: int
+        font2: int
+        align2: int
+        line3: string
+        pos_x3: int
+        pos_y3: int
+        font3: int
+        align3: int
+        line4: string
+        pos_x4: int
+        pos_y4: int
+        font4: int
+        align4: int
+        line5: string
+        pos_x5: int
+        pos_y5: int
+        font5: int
+        align5: int
+        line6: string
+        pos_x6: int
+        pos_y6: int
+        font6: int
+        align6: int
+        clear: bool
+      then:
+        - lambda: |-
+            id(msg1_text)  = line1;
+            id(msg1_x)     = pos_x1;
+            id(msg1_y)     = pos_y1;
+            id(msg1_font)  = font1;
+            id(msg1_align) = align1;
+
+            id(msg2_text)  = line2;
+            id(msg2_x)     = pos_x2;
+            id(msg2_y)     = pos_y2;
+            id(msg2_font)  = font2;
+            id(msg2_align) = align2;
+
+            id(msg3_text)  = line3;
+            id(msg3_x)     = pos_x3;
+            id(msg3_y)     = pos_y3;
+            id(msg3_font)  = font3;
+            id(msg3_align) = align3;
+
+            id(msg4_text)  = line4;
+            id(msg4_x)     = pos_x4;
+            id(msg4_y)     = pos_y4;
+            id(msg4_font)  = font4;
+            id(msg4_align) = align4;
+
+            id(msg5_text)  = line5;
+            id(msg5_x)     = pos_x5;
+            id(msg5_y)     = pos_y5;
+            id(msg5_font)  = font5;
+            id(msg5_align) = align5;
+
+            id(msg6_text)  = line6;
+            id(msg6_x)     = pos_x6;
+            id(msg6_y)     = pos_y6;
+            id(msg6_font)  = font6;
+            id(msg6_align) = align6;
+
+            id(msg_clear)   = clear;
+            id(screen_page) = 99;
+        - component.update: ses_display
+
+ota:
+  - platform: esphome
+    password: "30c7d23aa155455165ddb0c89b2f5232"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Test Fallback Hotspot"
+    password: "zfnwrgmJRhsh"
+
+captive_portal:
+
+
+web_server:
+  port: 80
+  version: 3
+
+esp32_ble_tracker:
+  scan_parameters:
+    interval: 5s 
+    window: 5s 
+    active: false
+
+xiaomi_ble:
+
+      
+sensor:
+  - platform: xiaomi_lywsd03mmc
+    mac_address: A4:C1:38:65:ED:F2
+    bindkey: 3c0375fd42e58d660ed6de5007da3070
+    temperature:
+      name: "Temperature_ble_yard"
+      id: temperature_ble_yard
+    humidity:
+      name: "Humidity_ble_yard"  
+      id: humidity_ble_yard
+
+  - platform: wifi_signal
+    id: wifi_rssi
+    name: "WiFi RSSI"
+    update_interval: 30s
+
+  - platform: uptime
+    id: device_uptime
+    name: "Uptime"
+    update_interval: 60s
+    
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      id: device_ip
+      name: "IP address"
+
+  - platform: template
+    id: ota5901_status
+    name: "OTA5901 Status 0x4A"
+    update_interval: never
+
+external_components:
+  - source:
+      type: local
+      path: components
+
+time:
+  - platform: sntp       
+    id: net_time
+    timezone: Asia/Yekaterinburg
+    servers:
+     - 0.ru.pool.ntp.org
+     - 1.ru.pool.ntp.org
+     - ntp0.NL.net
+    # on_time:
+    #   - minutes: /1
+    #     then:
+    #       - button.press: clock_and_date 
+         
+        
+font:
+  - file: fonts/Comic.ttf
+    size: 10
+    id: font_small
+    glyphs: |-
+      ! "#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz°|¬¾¼•АаБбВвГгҐґДдЕеЄєЖжЗзИиІіЇїЙйКкЛлМмНнОоПпРрСсТтУуФфХхЦцЧчШшЩщЬьЮюЯяЁёЪъЫыЭэ
+    ignore_missing_glyphs: true    
+  - file: fonts/Comic.ttf
+    size: 20
+    id: font_medium
+    glyphs: |-
+      ! "#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz°|¬¾¼•АаБбВвГгҐґДдЕеЄєЖжЗзИиІіЇїЙйКкЛлМмНнОоПпРрСсТтУуФфХхЦцЧчШшЩщЬьЮюЯяЁёЪъЫыЭэ
+    ignore_missing_glyphs: true    
+
+  - file: fonts/Comic.ttf
+    size: 40
+    id: font_big
+    glyphs: |-
+      ! "#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz°|¬¾¼•АаБбВвГгҐґДдЕеЄєЖжЗзИиІіЇїЙйКкЛлМмНнОоПпРрСсТтУуФфХхЦцЧчШшЩщЬьЮюЯяЁёЪъЫыЭэ
+    ignore_missing_glyphs: true    
+
+
+globals:
+  - id: screen_page
+    type: int
+    restore_value: no
+    initial_value: '0'
+
+  - id: msg_clear
+    type: bool
+    restore_value: no
+    initial_value: 'true'
+
+  # Строка 1
+  - id: msg1_text
+    type: std::string
+    restore_value: no
+    initial_value: '""'
+  - id: msg1_x
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: msg1_y
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: msg1_font
+    type: int
+    restore_value: no
+    initial_value: '0'
+
+  # Строка 2
+  - id: msg2_text
+    type: std::string
+    restore_value: no
+    initial_value: '""'
+  - id: msg2_x
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: msg2_y
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: msg2_font
+    type: int
+    restore_value: no
+    initial_value: '0'
+
+  # Строка 3
+  - id: msg3_text
+    type: std::string
+    restore_value: no
+    initial_value: '""'
+  - id: msg3_x
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: msg3_y
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: msg3_font
+    type: int
+    restore_value: no
+    initial_value: '0'
+
+  # Строка 4
+  - id: msg4_text
+    type: std::string
+    restore_value: no
+    initial_value: '""'
+  - id: msg4_x
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: msg4_y
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: msg4_font
+    type: int
+    restore_value: no
+    initial_value: '0'
+
+  # Строка 5
+  - id: msg5_text
+    type: std::string
+    restore_value: no
+    initial_value: '""'
+  - id: msg5_x
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: msg5_y
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: msg5_font
+    type: int
+    restore_value: no
+    initial_value: '0'
+
+  # Строка 6
+  - id: msg6_text
+    type: std::string
+    restore_value: no
+    initial_value: '""'
+  - id: msg6_x
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: msg6_y
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: msg6_font
+    type: int
+    restore_value: no
+    initial_value: '0'
+
+  - id: msg1_align
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: msg2_align
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: msg3_align
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: msg4_align
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: msg5_align
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: msg6_align
+    type: int
+    restore_value: no
+    initial_value: '0'
+
+display:
+  - platform: ota5901
+    id: ses_display
+    sd_pin: GPIO4
+    sclk_pin: GPIO5
+    cs_pin: GPIO6
+    reset_pin: GPIO7
+    xclk_pin: GPIO10
+    te_pin: GPIO1
+    xclk_frequency: 28800
+    spi_half_period_us: 1
+    ready_timeout_ms: 5000
+    te_delay_us: 50
+    skip_unchanged: true
+    update_interval: never
+    lambda: |-
+      it.fill(COLOR_OFF);
+      
+      if (id(screen_page) == 0) {
+        // PAGE 0: clock + network status
+        auto now = id(net_time).now();
+        it.rectangle(0, 0, 256, 128);
+        it.print(128, 4, id(font_small), TextAlign::TOP_CENTER, "OTA5901 / Universal v13");
+
+        if (now.is_valid()) {
+          it.printf(128, 25, id(font_big), TextAlign::TOP_CENTER,
+                    "%02d:%02d", now.hour, now.minute);
+          it.printf(128, 72, id(font_small), TextAlign::TOP_CENTER,
+                    "%02d-%02d-%04d", now.day_of_month, now.month, now.year);
+        } else {
+          it.print(128, 38, id(font_medium), TextAlign::TOP_CENTER, "Waiting for NTP");
+        }
+
+        it.printf(6, 103, id(font_small), "WiFi %.0f dBm", id(wifi_rssi).state);
+        it.printf(250, 103, id(font_small), TextAlign::TOP_RIGHT, "%s", id(device_ip).state.c_str());
+        it.printf(100, 97, id(font_medium), "%.0f °C", id(temperature_ble_yard).state);
+
+       
+       } else if (id(screen_page) == 1) {
+        // PAGE 1: device information
+        it.rectangle(0, 0, 256, 128);
+        it.print(8, 6, id(font_small), "SES display status");
+        it.line(8, 31, 247, 31);
+        it.printf(8, 39, id(font_small), "Controller: OTA5901");
+        it.printf(8, 58, id(font_small), "Panel: 256x128 mono TFT");
+        it.printf(8, 77, id(font_small), "XCLK: 28.8 kHz");
+        it.printf(8, 96, id(font_small), "WiFi: %.0f dBm", id(wifi_rssi).state);
+        it.printf(8, 113, id(font_small), "IP: %s", id(device_ip).state.c_str());
+
+      } else if (id(screen_page) == 2) {
+        // PAGE 2: ordinary ESPHome drawing API demo
+        it.rectangle(0, 0, 256, 128);
+        for (int x = 0; x < 256; x += 16)
+          it.line(x, 0, x, 127);
+        for (int y = 0; y < 128; y += 16)
+          it.line(0, y, 255, y);
+        it.line(0, 0, 255, 127);
+        it.line(255, 0, 0, 127);
+        it.filled_rectangle(12, 84, 60, 28);
+        it.print(128, 48, id(font_small), TextAlign::CENTER, "ESPHome");
+
+      } else if (id(screen_page) == 3) {
+        // PAGE 3: uploader instructions. Actual images are uploaded at /ota5901.
+        it.rectangle(0, 0, 256, 128);
+        it.print(128, 20, id(font_small), TextAlign::TOP_CENTER, "Image uploader");
+        it.print(128, 52, id(font_small), TextAlign::TOP_CENTER,
+                 "Open in browser:");
+        it.print(128, 72, id(font_small), TextAlign::TOP_CENTER,
+                 "/ota5901");
+        it.print(128, 99, id(font_small), TextAlign::TOP_CENTER,
+                 "PNG / JPEG / WebP -> 1 bpp");
+      
+
+      } else if (id(screen_page) == 99) {
+        if (id(msg_clear)) {
+          it.fill(COLOR_OFF);
+        }
+
+        esphome::font::Font *fonts[3] = {
+          id(font_small), id(font_medium), id(font_big)
+        };
+        auto pick_font = [&](int fid) -> esphome::font::Font * {
+          if (fid >= 0 && fid < 3) return fonts[fid];
+          return fonts[0];
+        };
+
+        // align: 0 = слева (используется x), 1 = центр (x игнорируется),
+        //        2 = справа (x игнорируется)
+        auto pick_align = [](int a) -> TextAlign {
+          switch (a) {
+            case 1:  return TextAlign::TOP_CENTER;
+            case 2:  return TextAlign::TOP_RIGHT;
+            default: return TextAlign::TOP_LEFT;
+          }
+        };
+
+        auto resolve_x = [](int al, int x) -> int {
+          if (al == 1) return 128;   // центр экрана
+          if (al == 2) return 248;   // правый край
+          return x;                  // align=0 — используем xN
+        };
+
+        auto draw_line = [&](const std::string &txt, int x, int y, int fid, int al) {
+          if (txt.empty()) return;
+          it.print(resolve_x(al, x), y, pick_font(fid), pick_align(al), txt.c_str());
+        };
+
+        draw_line(id(msg1_text), id(msg1_x), id(msg1_y), id(msg1_font), id(msg1_align));
+        draw_line(id(msg2_text), id(msg2_x), id(msg2_y), id(msg2_font), id(msg2_align));
+        draw_line(id(msg3_text), id(msg3_x), id(msg3_y), id(msg3_font), id(msg3_align));
+        draw_line(id(msg4_text), id(msg4_x), id(msg4_y), id(msg4_font), id(msg4_align));
+        draw_line(id(msg5_text), id(msg5_x), id(msg5_y), id(msg5_font), id(msg5_align));
+        draw_line(id(msg6_text), id(msg6_x), id(msg6_y), id(msg6_font), id(msg6_align));
+      }
+     
+button:
+  - platform: template
+    name: "Display: Clock"
+    id: clock_and_date
+    on_press:
+      - lambda: 'id(screen_page) = 0;'
+      - component.update: ses_display
+
+  - platform: template
+    name: "Display: Info"
+    on_press:
+      - lambda: 'id(screen_page) = 1;'
+      - component.update: ses_display
+
+  - platform: template
+    name: "Display: Drawing demo"
+    on_press:
+      - lambda: 'id(screen_page) = 2;'
+      - component.update: ses_display
+
+  - platform: template
+    name: "Display: Image uploader info"
+    on_press:
+      - lambda: 'id(screen_page) = 3;'
+      - component.update: ses_display
+
+  - platform: template
+    name: "Display: Refresh current page"
+    on_press:
+      - component.update: ses_display
+
+  - platform: template
+    name: "DEBUG: White"
+    on_press:
+      - lambda: |-
+          id(ses_display).debug_fill_white();
+
+  - platform: template
+    name: "DEBUG: Black"
+    on_press:
+      - lambda: |-
+          id(ses_display).debug_fill_black();
+
+  - platform: template
+    name: "DEBUG: Checkerboard 8x8"
+    on_press:
+      - lambda: |-
+          id(ses_display).debug_checkerboard(8);
+
+  - platform: template
+    name: "DEBUG: Raw 0x0F stripes"
+    on_press:
+      - lambda: |-
+          id(ses_display).debug_raw_fill(0x0F);
+
+  - platform: template
+    name: "DEBUG: Driver test pattern"
+    on_press:
+      - lambda: |-
+          id(ses_display).debug_test_pattern();
+
+  - platform: template
+    name: "DEBUG: Hard re-init + current frame"
+    on_press:
+      - lambda: |-
+          id(ses_display).debug_reinit_current();
+
+  - platform: template
+    name: "DEBUG: Read status 0x4A"
+    on_press:
+      - lambda: |-
+          const uint16_t s = id(ses_display).debug_read_status();
+          char text[12];
+          snprintf(text, sizeof(text), "0x%04X", s);
+          id(ota5901_status).publish_state(text);
