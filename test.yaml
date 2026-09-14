@@ -7,10 +7,8 @@ esp32:
   framework:
     type: arduino
 
-# Enable logging
 logger:
 
-# Enable Home Assistant API
 api:
   custom_services: true 
   encryption:
@@ -98,8 +96,6 @@ ota:
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
-
-  # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: "Test Fallback Hotspot"
     password: "zfnwrgmJRhsh"
@@ -122,8 +118,8 @@ xiaomi_ble:
       
 sensor:
   - platform: xiaomi_lywsd03mmc
-    mac_address: A4:C1:38:65:ED:F2
-    bindkey: 3c0375fd42e58d660ed6de5007da3070
+    mac_address: xxxxxxxxx
+    bindkey: yyyyyyyyyyyyyyyyyyyyyyyy
     temperature:
       name: "Temperature_ble_yard"
       id: temperature_ble_yard
@@ -166,12 +162,7 @@ time:
      - 0.ru.pool.ntp.org
      - 1.ru.pool.ntp.org
      - ntp0.NL.net
-    # on_time:
-    #   - minutes: /1
-    #     then:
-    #       - button.press: clock_and_date 
-         
-        
+
 font:
   - file: fonts/Comic.ttf
     size: 10
